@@ -72,8 +72,10 @@ def process_dates_page(path):
     desc = []
     for line in soup_select(soup, 'div.table p'):
         desc.append(line.text)
-    print desc
-    desc = sanitize(u' '.join(desc))
+    if desc:
+        desc = sanitize(u' '.join(desc))
+    else:
+        desc = ''
 
     table = soup.find('table', {'class': 'listing'})
     regex = re.compile('\d\d\.\d\d\.\d\d\d\d')
@@ -98,7 +100,8 @@ def main():
     counter = 0
     for link in links:
         counter += 1
-        log.info('[{0}/{1}] calendar pages scraped...'.format(counter, len(links)))
+        if counter % 100 == 0:
+            log.info('[{0}/{1}] calendar pages scraped...'.format(counter, len(links)))
         uid = urlparse.parse_qs(link['href'])['uid'][0]
         if uid in SCRAPED:
             log.error('Encountered uid {0} more than once, quitting...')
