@@ -60,7 +60,6 @@ def generate_ics_file(uid, data):
         event.add('dtend', end)
         cal.add_component(event)
     filename = '{0}.ics'.format(uid)
-    log.info('Saving {0}'.format(filename))
     with open(os.path.join(OUTPUT_DIR, filename), 'wb') as f:
         f.write(cal.to_ical())
 
@@ -105,6 +104,7 @@ def main():
             return
         SCRAPED[uid] = process_dates_page(link['href'])
 
+    log.info('Saving data...')
     for uid, data in SCRAPED.iteritems():
         generate_ics_file(uid, data)
     log.info('All done!')
