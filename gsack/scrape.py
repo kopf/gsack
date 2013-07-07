@@ -72,10 +72,7 @@ def process_dates_page(path):
     desc = []
     for line in soup_select(soup, 'div.table p'):
         desc.append(line.text)
-    if desc:
-        desc = sanitize(u' '.join(desc))
-    else:
-        desc = ''
+    desc = sanitize(u' '.join(desc))
 
     table = soup.find('table', {'class': 'listing'})
     regex = re.compile('\d\d\.\d\d\.\d\d\d\d')
