@@ -5,10 +5,4 @@ POSTCODES = [70173, 70174, 70176, 70178, 70180, 70182, 70184, 70186, 70188,
 
 PAUSE_LENGTH = 1 # pause between scraping pages, in seconds
 
-DATABASE = {
-    'host': 192.168.92.20,
-    'port': 3128,
-    'username': 'gsack',
-    'password': 'gsack',
-    'name': 'gsack'
-}
+OUTPUT_DIR = './output'
