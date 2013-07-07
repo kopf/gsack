@@ -5,5 +5,5 @@ POSTCODES = [70173, 70174, 70176, 70178, 70180, 70182, 70184, 70186, 70188,
 
 SCRAPE_SLEEP = 1 # pause between each GET request, in seconds
 
-OUTPUT_DIR = '/var/www/gsack/calendar'
+OUTPUT_DIR = '/home/kopf/gsack-output'
 
