@@ -9,6 +9,7 @@
 from datetime import datetime, timedelta
 import os
 import re
+import time
 import urlparse
 
 from BeautifulSoup import BeautifulSoup
@@ -16,7 +17,7 @@ from icalendar import Calendar, Event
 import logbook
 import requests
 
-from gsack.settings import POSTCODES, OUTPUT_DIR
+from gsack.settings import POSTCODES, OUTPUT_DIR, SCRAPE_SLEEP
 from gsack.lib.soupselect import select as soup_select
 
 
@@ -27,6 +28,10 @@ SCRAPED = {}
 
 log = logbook.Logger('gsack.scraper.scrape')
 
+
+def download(url):
+    time.sleep(SCRAPE_SLEEP)
+    return requests.get(url)
 
 def sanitize(text):
     """Replaces umlauts and Eszett with non-unicode equivalents"""
@@ -62,7 +67,7 @@ def generate_ics_file(uid, data):
 
 def process_dates_page(path):
     """Processes page with on which the Abholtermine are"""
-    r = requests.get(BASE_URL.format(path))
+    r = download(BASE_URL.format(path))
     soup = BeautifulSoup(r.text)
     desc = []
     for line in soup_select(soup, 'div.table p'):
@@ -86,7 +91,7 @@ def main():
     links = []
     for plz in POSTCODES:
         log.info('Scraping URLs for PLZ {0}'.format(plz))
-        r = requests.get(URL.format(plz))
+        r = download(URL.format(plz))
         soup = BeautifulSoup(r.text)
         links.extend(soup_select(soup, '.cols2 a'))
 
