@@ -105,11 +105,9 @@ def main():
         if uid in SCRAPED:
             log.error('Encountered uid {0} more than once, quitting...')
             return
-        SCRAPED[uid] = process_dates_page(link['href'])
+        raw_data = process_dates_page(link['href'])
+        generate_ics_file(uid, raw_data)
 
-    log.info('Saving data...')
-    for uid, data in SCRAPED.iteritems():
-        generate_ics_file(uid, data)
     log.info('All done!')
 
 
