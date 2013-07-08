@@ -33,13 +33,14 @@ def download(url):
     time.sleep(SCRAPE_SLEEP)
     return requests.get(url)
 
-def sanitize(text):
-    """Replaces umlauts and Eszett with non-unicode equivalents"""
+def clean_description(text):
+    """Replaces umlauts and Eszett with non-unicode equivalents, removes unnecessary crap"""
     trans_map = {
         u'ä': 'ae',
         u'ö': 'oe',
         u'ü': 'ue',
-        u'ß': 'ss'
+        u'ß': 'ss',
+        u' () ': ''
     }
     for char, replacement in trans_map.iteritems():
         text = text.replace(char, replacement)
@@ -71,7 +72,7 @@ def process_dates_page(path):
     desc = []
     for line in soup_select(soup, 'div.table p'):
         desc.append(line.text)
-    desc = sanitize(u' '.join(desc))
+    desc = clean_description(u' '.join(desc))
 
     table = soup.find('table', {'class': 'listing'})
     regex = re.compile('\d\d\.\d\d\.\d\d\d\d')
