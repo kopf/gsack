@@ -29,6 +29,10 @@ SCRAPED = {}
 log = logbook.Logger('gsack.scraper.scrape')
 
 
+class UpstreamError(Exception):
+    pass
+
+
 def download(url):
     time.sleep(SCRAPE_SLEEP)
     try:
@@ -36,7 +40,7 @@ def download(url):
     except (requests.exceptions.ConnectionError,
             requests.exceptions.SSLError), e:
         log.error(u'Exception occured getting {0}: {1}'.format(url, e))
-        raise
+        raise UpstreamError()
     return retval
 
 
@@ -115,7 +119,7 @@ def main():
             return
         try:
             raw_data = process_dates_page(link['href'])
-        except Exception:
+        except UpstreamError:
             continue
         generate_ics_file(uid, raw_data)
 
