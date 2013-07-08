@@ -31,7 +31,13 @@ log = logbook.Logger('gsack.scraper.scrape')
 
 def download(url):
     time.sleep(SCRAPE_SLEEP)
-    return requests.get(url)
+    try:
+        retval = requests.get(url)
+    except requests.exceptions.ConnectionError, e:
+        log.error(u'Exception occured getting {0}: {1}'.format(url, e))
+        raise
+    return retval
+
 
 def clean_description(text):
     """Replaces umlauts and Eszett with non-unicode equivalents, removes unnecessary crap"""
@@ -45,6 +51,7 @@ def clean_description(text):
     for char, replacement in trans_map.iteritems():
         text = text.replace(char, replacement)
     return text
+
 
 def generate_ics_file(uid, data):
     """Processes scraped data and generates an .ics file"""
@@ -105,7 +112,10 @@ def main():
         if uid in SCRAPED:
             log.error('Encountered uid {0} more than once, quitting...')
             return
-        raw_data = process_dates_page(link['href'])
+        try:
+            raw_data = process_dates_page(link['href'])
+        except Exception:
+            continue
         generate_ics_file(uid, raw_data)
 
     log.info('All done!')
