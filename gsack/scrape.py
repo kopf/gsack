@@ -49,8 +49,10 @@ def clean_description(text):
 def generate_ics_file(uid, data):
     """Processes scraped data and generates an .ics file"""
     cal = Calendar()
-    cal.add('prodid', '-//GSack - Gelber Sack Abholtermine - ventolin.org//NONSGML//DE')
+    cal.add('prodid', '-//GSack Calendar Generator - github.com/kopf/gsack //NONSGML//DE')
     cal.add('version', '2.0')
+    cal.add('x-wr-calname', 'Gelber Sack Abholtermine')
+    cal.add('x-original-url', 'http://ventolin.org/code/gelber-sack')
     cal.add('x-wr-caldesc', data.get('description'))
     for datestr in data['dates']:
         start = datetime.strptime(datestr, '%d.%m.%Y').date()
