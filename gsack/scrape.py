@@ -33,7 +33,8 @@ def download(url):
     time.sleep(SCRAPE_SLEEP)
     try:
         retval = requests.get(url)
-    except requests.exceptions.ConnectionError, e:
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.SSLError), e:
         log.error(u'Exception occured getting {0}: {1}'.format(url, e))
         raise
     return retval
