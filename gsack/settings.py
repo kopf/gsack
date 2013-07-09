@@ -7,3 +7,5 @@ SCRAPE_SLEEP = 5 # pause between each GET request, in seconds
 
 OUTPUT_DIR = '/home/kopf/www/gsack-output'
 
+RETRIES = 5
+
