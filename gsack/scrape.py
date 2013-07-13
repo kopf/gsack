@@ -18,7 +18,7 @@ from icalendar import Calendar, Event
 import logbook
 import requests
 
-from gsack.settings import POSTCODES, OUTPUT_DIR, SCRAPE_SLEEP
+from gsack.settings import POSTCODES, OUTPUT_DIR, SCRAPE_SLEEP, RETRIES
 from gsack.lib.soupselect import select as soup_select
 
 
@@ -36,13 +36,20 @@ class UpstreamError(Exception):
 
 def download(url):
     time.sleep(SCRAPE_SLEEP)
-    try:
-        retval = requests.get(url)
-    except (requests.exceptions.ConnectionError,
-            requests.exceptions.SSLError), e:
-        log.error(u'Exception occured getting {0}: {1}'.format(url, e))
-        raise UpstreamError()
-    return retval
+    count = 0
+    for c in range(0, RETRIES):
+        try:
+            retval = requests.get(url)
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.SSLError), e:
+            log.error(u'Exception occured getting {0}: {1}'.format(url, e))
+        else:
+            if not retval.text:
+                log.info(u'No data returned getting {0}. Waiting and retrying...'.format(url))
+                time.sleep(SCRAPE_SLEEP*2)
+                continue
+            return retval
+    raise UpstreamError()
 
 
 def clean_description(text):
@@ -52,7 +59,7 @@ def clean_description(text):
         u'ö': 'oe',
         u'ü': 'ue',
         u'ß': 'ss',
-        u' () ': ''
+        u' () ': ' '
     }
     for char, replacement in trans_map.iteritems():
         text = text.replace(char, replacement)
