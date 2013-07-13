@@ -7,12 +7,13 @@
 #
 
 from datetime import datetime, timedelta
+import json
 import os
 import re
 import time
-import urlparse
+from urlparse import parse_qs
 
-from BeautifulSoup import BeautifulSoup
+import BeautifulSoup
 from icalendar import Calendar, Event
 import logbook
 import requests
@@ -82,7 +83,7 @@ def generate_ics_file(uid, data):
 def process_dates_page(path):
     """Processes page with on which the Abholtermine are"""
     r = download(BASE_URL.format(path))
-    soup = BeautifulSoup(r.text)
+    soup = BeautifulSoup.BeautifulSoup(r.text)
     desc = []
     for line in soup_select(soup, 'div.table p'):
         desc.append(line.text)
@@ -100,20 +101,45 @@ def process_dates_page(path):
     return {'dates': dates, 'description': desc}
 
 
+def save_plz_metadata(plz, soup):
+    """Save metadata for each PLZ used by the search interface"""
+    result = []
+    table_body = soup.find('tbody')
+    rows = table_body.findAll('tr')
+    for tr in rows:
+        link = tr.find('td', {'class': 'cols2'}).a['href']
+        uid = parse_qs(link)['uid'][0]
+        street = tr.find('td', {'class': 'cols2'}).text
+        info_list = []
+        for element in tr.find('td', {'class': 'cols4'}).contents:
+            if not isinstance(element, BeautifulSoup.Tag):
+                info_list.append(element)
+        amtliche_nr = tr.find('td', {'class': 'cols5'}).text
+        result.append({
+            'uid': uid,
+            'street': street,
+            'info': ', '.join(info_list),
+            'amtliche_nr': amtliche_nr
+        })
+    with open(os.path.join(OUTPUT_DIR, '{0}.json'.format(plz)), 'w') as f:
+        json.dump(result, f, indent=4)
+
+
 def main():
     links = []
     for plz in POSTCODES:
         log.info('Scraping URLs for PLZ {0}'.format(plz))
         r = download(URL.format(plz))
-        soup = BeautifulSoup(r.text)
+        soup = BeautifulSoup.BeautifulSoup(r.text)
         links.extend(soup_select(soup, '.cols2 a'))
+        save_plz_metadata(plz, soup)
 
     counter = 0
     for link in links:
         counter += 1
         if counter % 100 == 0:
             log.info('[{0}/{1}] calendar pages scraped...'.format(counter, len(links)))
-        uid = urlparse.parse_qs(link['href'])['uid'][0]
+        uid = parse_qs(link['href'])['uid'][0]
         if uid in SCRAPED:
             log.error('Encountered uid {0} more than once, quitting...')
             return
