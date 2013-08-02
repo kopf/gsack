@@ -137,6 +137,8 @@ def main():
     for plz in POSTCODES:
         log.info('Scraping URLs for PLZ {0}'.format(plz))
         r = download(URL.format(plz))
+        if 'Ihre Eingabe ergab kein Ergebnis' in r.text:
+            continue
         soup = BeautifulSoup.BeautifulSoup(r.text)
         links.extend(soup_select(soup, '.cols2 a'))
         save_plz_metadata(plz, soup)
