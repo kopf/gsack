@@ -103,8 +103,8 @@ def process_dates_page(path):
         result = regex.search(cell.text)
         if result is not None:
             dates.append(result.group())
-    if len(dates) < 4:
-        log.warn(u'Less than 4 dates scraped from {0}'.format(path))
+    if not dates:
+        log.warn(u'No dates scraped from {0}'.format(path))
     return {'dates': dates, 'description': desc}
 
 
