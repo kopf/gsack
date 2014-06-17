@@ -60,7 +60,7 @@ def generate_ics_file(uid, data):
 
 if __name__ == '__main__':
     payload = {'__EVENTTARGET': 'ThatStreet'}
-    for uid in range(1, 17):
+    for uid in range(1, 16):
         log.info('Processing UID {0}'.format(uid))
         payload['__EVENTARGUMENT'] = str(uid)
         resp = requests.post(URL, data=payload)
