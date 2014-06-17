@@ -103,8 +103,8 @@ def process_dates_page(path):
         result = regex.search(cell.text)
         if result is not None:
             dates.append(result.group())
-    if len(dates) < 4:
-        log.warn(u'Less than 4 dates scraped from {0}'.format(path))
+    if not dates:
+        log.warn(u'No dates scraped from {0}'.format(path))
     return {'dates': dates, 'description': desc}
 
 
@@ -137,6 +137,8 @@ def main():
     for plz in POSTCODES:
         log.info('Scraping URLs for PLZ {0}'.format(plz))
         r = download(URL.format(plz))
+        if 'Ihre Eingabe ergab kein Ergebnis' in r.text:
+            continue
         soup = BeautifulSoup.BeautifulSoup(r.text)
         links.extend(soup_select(soup, '.cols2 a'))
         save_plz_metadata(plz, soup)
