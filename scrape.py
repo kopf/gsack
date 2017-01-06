@@ -95,11 +95,11 @@ def scrape_pdf():
         if re.compile('{0} {0} {0}'.format(date_regex)).search(line):
             dates = re.findall(date_regex, line)
             for idx, date in enumerate(dates):
-                if '.12.' in date:
-                    # It's a date for December of the previous year
-                    del(dates[idx])
-                else:
-                    break
+                if ((idx < len(dates) / 2 and '.12.' in date)
+                        or (idx > len(dates) / 2 and '.01.' in date)):
+                    # Either a pickup date from december from the previous year
+                    # or a pickup date from january from the next year
+                    del dates[idx]
             results.append({
                 'dates': ['{}{}'.format(d, current_year) for d in dates],
                 'description': "Gelber Sack Abholtermine"
