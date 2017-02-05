@@ -11,13 +11,13 @@ import os
 import re
 import subprocess
 import tempfile
-
+import uuid
+from socket import gethostname
 
 from BeautifulSoup import BeautifulSoup
 from icalendar import Calendar, Event
 import logbook
 import requests
-from socket import gethostname
 
 OUTPUT_DIR = '/home/kopf/www/gsack-output'
 
@@ -58,7 +58,7 @@ def generate_ics_file(uid, data):
         event.add('summary', 'Gelber Sack Abholtermin')
         event.add('dtstart', start)
         event.add('dtend', end)
-        event.add('uid', datetime.now().strftime("%Y%m%dT%H%M%S-%f") + "@" + gethostname())
+        event.add('uid', str(uuid.uuid4()) + "@" + gethostname())
         cal.add_component(event)
     filename = '{0}.ics'.format(uid)
     with open(os.path.join(OUTPUT_DIR, filename), 'wb') as f:
